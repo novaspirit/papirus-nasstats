@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 ExecStart=/home/pi/nasstat.py
-Rstart=always
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
