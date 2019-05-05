@@ -1,0 +1,11 @@
+[Unit]
+Description = papirus nas status
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/home/pi/nasstat.py
+Rstart=always
+
+[Install]
+WantedBy=multi-user.target
