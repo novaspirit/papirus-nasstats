@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+
 import psutil
 import platform
 import datetime
@@ -24,6 +26,16 @@ def get_ip_address(ifname):
 		0x8915,  # SIOCGIFADDR
 		struct.pack('256s', ifname[:15])
 	)[20:24])
+
+def get_ips(ifname):
+	ifaces = psutil.net_if_addrs()
+	for iface, info in ifaces.items():
+		if iface == ifname:
+			ip = info[0].address
+		continue
+	if not ip:
+		ip = "network not ready"
+	return ip
 
 def drawProgressBar(percent, barLen = 14):
 	progress = ""
@@ -106,7 +118,7 @@ def main():
 	#fetch init data
 	os, name, version, _, _, _ = platform.uname()
 	version = version.split('-')[0]
-	ipaddr = get_ip_address(network_adaptor)	
+	ipaddr = get_ips(network_adaptor)	
 	cpupercent = str(int(psutil.cpu_percent()))
 	disk_free = psutil.disk_usage(mountpoint)[2]
 	disk_used = psutil.disk_usage(mountpoint)[1]
@@ -142,6 +154,7 @@ def main():
 
 	while True:
 		cpupercent = str(int(psutil.cpu_percent()))
+		ipaddr = get_ips(network_adaptor)
 		disk_free = psutil.disk_usage(mountpoint)[2]
 		disk_used = psutil.disk_usage(mountpoint)[1]
 		disk_percent = str(int(psutil.disk_usage(mountpoint)[3]))
@@ -158,6 +171,7 @@ def main():
 		rx_data = net[network_adaptor].bytes_recv
 		net_data = convert_size(rx_data) + ' RX / ' + convert_size(tx_data) + ' TX' 
 		
+		comp.UpdateText("ipaddr", "IP: " + ipaddr)
 		comp.UpdateText("uptime", "Uptime: " + uptime())
 		comp.UpdateText("netdata", "Net: " + net_data)
 		comp.UpdateText("cpubar", drawProgressBar(psutil.cpu_percent()))
